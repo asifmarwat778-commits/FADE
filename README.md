@@ -3,13 +3,13 @@
 
 
 # # RatePred
-RatePred is a machine learning GUI for predicting the observed pseudo-first-order rate constant (*k*ₒbₛ) from operational inputs in UV/chlor(am)ine/Fe(III) advanced oxidation processes.
+RatePred is a machine learning GUI for predicting the observed pseudo-first-order rate constant (kobs) from operational inputs in UV/chlor(am)ine/Fe(III) advanced oxidation processes.
 
 ## Using RatePred
 The tool is available from the script `gui.py`. It is intended to be run locally via Python. The user can select the target AOP system (UV/HOCl/Fe(III) or UV/NH2Cl/Fe(III)), enter individual operational parameters or batch inputs, and the GUI will output the predicted kobs along with SHAP-based feature importance and one-at-a-time sensitivity trajectories for the entered scenario
 
 ## Training Dataset
-The complete datasets of experimentally measured *k*ₒbₛ values used to train RatePred are given in the files `Data_HOCl.csv` (304 data points) and `Data_NH2Cl.csv` (863 data points).
+The complete datasets of experimentally measured kobs values used to train RatePred are given in the files `Data2026042605 ONP HOCl.csv` (304 data points) and `Data_NH2Cl.csv` (863 data points) Data2026042605 ONP NH2Cl.csv.
 
 ## Citation
 Muhammad Asif, Wei Wang, Aiwen Wang, Hidayat Ullah Khan. "Pseudo-first-order reaction rate prediction using machine learning: RatePred." *Water Research* 2026, XX, XXXX-XXXX. DOI: [10.1021/acs.est.5c16184](https://doi.org/10.1021/acs.est.5c16184)
