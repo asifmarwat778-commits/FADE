@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="681" height="143" alt="Screenshot 2026-04-14 at 6 03 34 PM" src="https://github.com/user-attachments/assets/c8c4cf39-afb0-4c2b-978f-70b26b47a487" />
+  <img width="681" height="143" alt="Screenshot 2026-04-14 at 6 03 34 PM" <img width="1333" height="970" alt="Image" src="https://github.com/user-attachments/assets/042ca68e-e426-4809-a7ba-dfa3f40f7098" />
 
 
 # # RatePred
