@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="681" height="143" alt="Screenshot 2026-04-14 at 6 03 34 PM" <img width="1333" height="970" alt="Image" src="https://github.com/user-attachments/assets/042ca68e-e426-4809-a7ba-dfa3f40f7098" />
+  <img width="595" height="627" alt="Image" src="https://github.com/user-attachments/assets/1c9a50a7-c54a-4005-b35a-69cd3d3f0a28" />
 
 
 # # FADE
