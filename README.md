@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="595" height="627" alt="Image" src="https://github.com/user-attachments/assets/1c9a50a7-c54a-4005-b35a-69cd3d3f0a28" />
+  <img width="732" height="261" alt="Image" src="https://github.com/user-attachments/assets/22d5de75-a283-4791-be50-18f43ecf8df8" />
 
 
 # # FADE
