@@ -1,0 +1,328 @@
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+
+
+# ============================================================
+# Settings
+# ============================================================
+
+FILE_PATH = Path(
+    r"D:\HIT Research\Research Paper 2\Updated Paper after 26 OCtober\Papers and data in excel sheet\ML data excel sheet\202610030308.csv"
+)
+
+TARGET = "kobs"
+TEST_SIZE = 0.20
+RANDOM_STATE = 42
+
+OUTPUT_DIR = Path(
+    r"C:\Users\asif\PycharmProjects\pythonProject\RFR_results"
+)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# ============================================================
+# Evaluation metrics
+# ============================================================
+
+def calculate_metrics(observed, predicted):
+    """
+    Calculate:
+    R2   - Coefficient of determination
+    d    - Willmott's Index of Agreement
+    KGE  - Kling-Gupta Efficiency (2009)
+    E1   - Legates-McCabe Efficiency
+    MAE  - Mean Absolute Error
+    RMSE - Root Mean Squared Error
+    MBE  - Mean Bias Error
+    """
+
+    observed = np.asarray(observed, dtype=float).ravel()
+    predicted = np.asarray(predicted, dtype=float).ravel()
+
+    if observed.size != predicted.size or observed.size < 2:
+        raise ValueError(
+            "Metrics require at least two matched observations."
+        )
+
+    if not (
+        np.isfinite(observed).all()
+        and np.isfinite(predicted).all()
+    ):
+        raise ValueError(
+            "Observed and predicted values must be finite."
+        )
+
+    # Positive MBE means overprediction; negative means underprediction.
+    error = predicted - observed
+
+    observed_mean = np.mean(observed)
+    predicted_mean = np.mean(predicted)
+
+    # R2: coefficient of determination
+    r2_denominator = np.sum((observed - observed_mean) ** 2)
+
+    if r2_denominator > 0:
+        r2 = 1.0 - np.sum(error ** 2) / r2_denominator
+    else:
+        r2 = np.nan
+
+    # Willmott's Index of Agreement (d)
+    d_denominator = np.sum(
+        (
+            np.abs(predicted - observed_mean)
+            + np.abs(observed - observed_mean)
+        ) ** 2
+    )
+
+    if d_denominator > 0:
+        d = 1.0 - np.sum(error ** 2) / d_denominator
+    else:
+        d = np.nan
+
+    # Kling-Gupta Efficiency (KGE, 2009)
+    observed_sd = np.std(observed, ddof=1)
+    predicted_sd = np.std(predicted, ddof=1)
+
+    if (
+        observed_sd > 0
+        and predicted_sd > 0
+        and observed_mean != 0
+    ):
+        correlation = np.corrcoef(observed, predicted)[0, 1]
+        alpha = predicted_sd / observed_sd
+        beta = predicted_mean / observed_mean
+
+        kge = 1.0 - np.sqrt(
+            (correlation - 1.0) ** 2
+            + (alpha - 1.0) ** 2
+            + (beta - 1.0) ** 2
+        )
+    else:
+        kge = np.nan
+
+    # Legates-McCabe Efficiency (E1)
+    e1_denominator = np.sum(
+        np.abs(observed - observed_mean)
+    )
+
+    if e1_denominator > 0:
+        e1 = (
+            1.0
+            - np.sum(np.abs(error)) / e1_denominator
+        )
+    else:
+        e1 = np.nan
+
+    # Error metrics
+    mae = np.mean(np.abs(error))
+    rmse = np.sqrt(np.mean(error ** 2))
+    mbe = np.mean(error)
+
+    return {
+        "R2": r2,
+        "d": d,
+        "KGE": kge,
+        "E1": e1,
+        "MAE": mae,
+        "RMSE": rmse,
+        "MBE": mbe,
+    }
+
+
+# ============================================================
+# Load and validate the dataset
+# ============================================================
+
+if not FILE_PATH.exists():
+    raise FileNotFoundError(
+        f"CSV file not found:\n{FILE_PATH}"
+    )
+
+data = pd.read_csv(FILE_PATH)
+data.columns = data.columns.str.strip()
+
+if TARGET not in data.columns:
+    raise ValueError(
+        f"Target column '{TARGET}' was not found.\n"
+        f"Available columns: {list(data.columns)}"
+    )
+
+data = data.apply(pd.to_numeric, errors="raise")
+
+if (
+    data.isna().any().any()
+    or not np.isfinite(data.to_numpy()).all()
+):
+    raise ValueError(
+        "The CSV contains missing or infinite values."
+    )
+
+X = data.drop(columns=TARGET)
+y = data[TARGET]
+
+
+# ============================================================
+# Training/test split
+# ============================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=TEST_SIZE,
+    random_state=RANDOM_STATE,
+    shuffle=True,
+)
+
+
+# ============================================================
+# Random Forest Regressor (RFR)
+# ============================================================
+
+model = RandomForestRegressor(
+    n_estimators=500,
+    criterion="squared_error",
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features=1.0,
+    bootstrap=True,
+    random_state=RANDOM_STATE,
+    n_jobs=-1,
+)
+
+# Keep the same target-scaling procedure used previously.
+target_scale = float(y_train.std(ddof=0))
+
+if target_scale == 0:
+    raise ValueError(
+        "The training target is constant."
+    )
+
+model.fit(
+    X_train,
+    y_train / target_scale
+)
+
+
+# ============================================================
+# Predict Training, Test, and Combined datasets
+# ============================================================
+
+train_pred = (
+    model.predict(X_train) * target_scale
+)
+
+test_pred = (
+    model.predict(X_test) * target_scale
+)
+
+combined_pred = (
+    model.predict(X) * target_scale
+)
+
+
+# ============================================================
+# Calculate metrics for all three datasets
+# ============================================================
+
+results = pd.DataFrame(
+    [
+        {
+            "Dataset": "Training",
+            "N": len(y_train),
+            **calculate_metrics(
+                y_train,
+                train_pred
+            ),
+        },
+        {
+            "Dataset": "Test",
+            "N": len(y_test),
+            **calculate_metrics(
+                y_test,
+                test_pred
+            ),
+        },
+        {
+            "Dataset": "Combined",
+            "N": len(y),
+            **calculate_metrics(
+                y,
+                combined_pred
+            ),
+        },
+    ]
+).set_index("Dataset")
+
+results = results[
+    [
+        "N",
+        "R2",
+        "d",
+        "KGE",
+        "E1",
+        "MAE",
+        "RMSE",
+        "MBE",
+    ]
+]
+
+print("\nRFR evaluation results:")
+print(
+    results.to_string(
+        float_format=lambda value: f"{value:.10g}"
+    )
+)
+
+metrics_file = OUTPUT_DIR / "RFR_metrics.csv"
+results.to_csv(metrics_file, index=True)
+
+
+# ============================================================
+# Save observed and predicted values
+# ============================================================
+
+predictions = pd.DataFrame(
+    {
+        "CSV_row": np.arange(len(data)) + 2,
+        "Dataset": np.where(
+            data.index.isin(X_train.index),
+            "Training",
+            "Test",
+        ),
+        "Observed_kobs": y.to_numpy(),
+        "Predicted_kobs": combined_pred,
+    }
+)
+
+predictions["Error_predicted_minus_observed"] = (
+    predictions["Predicted_kobs"]
+    - predictions["Observed_kobs"]
+)
+
+# Combined predictions for every dataset row.
+predictions.to_csv(
+    OUTPUT_DIR / "RFR_predictions_combined.csv",
+    index=False,
+)
+
+# Separate Training and Test prediction files.
+for subset in ["Training", "Test"]:
+    subset_predictions = predictions.loc[
+        predictions["Dataset"] == subset
+    ]
+
+    subset_predictions.to_csv(
+        OUTPUT_DIR
+        / f"RFR_predictions_{subset.lower()}.csv",
+        index=False,
+    )
+
+
+print("\nAll RFR results were saved successfully.")
+print(f"Results folder: {OUTPUT_DIR}")
+print(f"Metrics file: {metrics_file}")
