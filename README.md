@@ -10,10 +10,11 @@ FADE supports two treatment systems:
 
 - UV/HOCl/Fe(III)
 - UV/NH₂Cl/Fe(III)
+  Treatment processes of 11 studies from the literature
 
 ## Features
 
-- Individual and batch prediction of $k_{\mathrm{obs}}$
+- Individual and batch prediction of kobs
 - SHAP-based model interpretation
 - One-at-a-time sensitivity analysis
 - Experimental and literature-derived training datasets
@@ -24,9 +25,9 @@ FADE supports two treatment systems:
 FADE runs locally in Python. The following GUI implementations are provided:
 
 - `FADE_GUI_DTR_UV_HOCl_Fe(III).py` for UV/HOCl/Fe(III)
-- `FADE_GUI_XGBR_UV_NH2Cl_Fe(III).ipynb` for UV/NH₂Cl/Fe(III)
+- `FADE_GUI_XGBR_UV_NH2Cl_Fe(III).ipynb` for UV/NH2Cl/Fe(III)
 
-Users can enter individual operational parameters or provide batch inputs to obtain predicted $k_{\mathrm{obs}}$ values, SHAP-based feature interpretations, and sensitivity trajectories for the selected scenario.
+Users can enter individual operational parameters or provide batch inputs to obtain predicted kobs values, SHAP-based feature interpretations, and sensitivity trajectories for the selected scenario.
 
 ## Training Datasets
 
@@ -34,13 +35,13 @@ The repository provides the datasets used for model training and evaluation:
 
 - `Experimental Data of ONP degradation during UV HOCl Fe(III) for ML models training.csv`: 391 experimental observations for ortho-nitrophenol degradation in the UV/HOCl/Fe(III) system.
 - `Experimental Data of ONP degradation during UV NH2Cl Fe(III) for ML models training.csv`: experimental observations for ortho-nitrophenol degradation in the UV/NH₂Cl/Fe(III) system.
-- `Experimetnal data from Litrature for Machine Learning Training.csv`: 862 literature-derived observations covering 51 micropollutants reported in 11 studies.
+- `Experimental data from Literature for Machine Learning Training.csv`: 663 literature-derived observations covering 51 micropollutants reported in 11 studies.
 
-The datasets include operational and water-matrix input variables together with experimental or literature-derived $k_{\mathrm{obs}}$ values.
+The datasets include operational and water-matrix input variables together with experimental or literature-derived kobs values.
 
 ## GUI Demonstrations
 
-Video demonstrations are provided for the UV/HOCl/Fe(III) and UV/NH₂Cl/Fe(III) interfaces, together with a combined presentation illustrating GUI operation for both treatment systems.
+Video demonstrations are provided for the UV/HOCl/Fe(III) and UV/NH2Cl/Fe(III) interfaces, together with a combined presentation illustrating GUI operation for both treatment systems.
 
 ## Citation
 
@@ -56,4 +57,4 @@ If you use FADE in your research, please cite the associated manuscript. Full ci
 
 **Muhammad Asif**  
 Harbin Institute of Technology  
-Email: [20250366@hit.edu.cn](mailto:20250366@hit.edu.cn)
+Email:20250366@hit.edu.cn
